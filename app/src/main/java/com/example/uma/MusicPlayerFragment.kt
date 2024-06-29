@@ -12,17 +12,19 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 
-class MusicPlayerFragment : Fragment(), MediaPlayer.OnCompletionListener {
+class MusicPlayerFragment : Fragment() {
 
     private lateinit var mediaPlayer: MediaPlayer
     private var albumResId: Int? = null
     private var imageResId: Int? = null
+    private var season: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             albumResId = it.getInt("albumResId")
             imageResId = it.getInt("imageResId")
+            season = it.getString("season")
         }
     }
 
@@ -42,6 +44,19 @@ class MusicPlayerFragment : Fragment(), MediaPlayer.OnCompletionListener {
         val songTitle: TextView = view.findViewById(R.id.song_title)
         val songArtist: TextView = view.findViewById(R.id.song_artist)
 
+        // 배경색 설정
+        val rootView: View = view.findViewById(R.id.music_player_root)
+        season?.let {
+            val backgroundColor = when (it.lowercase()) {
+                "spring" -> R.color.springColor
+                "summer" -> R.color.summerColor
+                "autumn" -> R.color.autumnColor
+                "winter" -> R.color.winterColor
+                else -> R.color.springColor
+            }
+            rootView.setBackgroundColor(resources.getColor(backgroundColor, null))
+        }
+
         exitButton.setOnClickListener {
             mediaPlayer.stop()
             mediaPlayer.release()
@@ -60,7 +75,9 @@ class MusicPlayerFragment : Fragment(), MediaPlayer.OnCompletionListener {
 
         albumResId?.let {
             mediaPlayer = MediaPlayer.create(context, it)
-            mediaPlayer.setOnCompletionListener(this)
+            mediaPlayer.setOnCompletionListener {
+                findNavController().navigateUp()
+            }
             mediaPlayer.start()
 
             // 곡 정보 설정
@@ -72,10 +89,6 @@ class MusicPlayerFragment : Fragment(), MediaPlayer.OnCompletionListener {
         imageResId?.let {
             albumImage.setImageResource(it)
         }
-    }
-
-    override fun onCompletion(mp: MediaPlayer?) {
-        findNavController().navigateUp()
     }
 
     override fun onDestroy() {

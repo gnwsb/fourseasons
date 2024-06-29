@@ -1,22 +1,32 @@
 package com.example.seasonsapp
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import android.provider.ContactsContract
-import android.database.Cursor
-import android.widget.LinearLayout
-import android.widget.TextView
 
 class ContactFragment : Fragment() {
 
+    private lateinit var season: String
+
     companion object {
-        fun newInstance(season: String) = ContactFragment().apply {
-            arguments = Bundle().apply {
-                putString("SEASON", season)
-            }
+        fun newInstance(season: String): ContactFragment {
+            val fragment = ContactFragment()
+            val args = Bundle()
+            args.putString("season", season)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            season = it.getString("season") ?: ""
         }
     }
 
@@ -30,24 +40,16 @@ class ContactFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val contactsLayout = view.findViewById<LinearLayout>(R.id.contacts_layout)
-
-        val cursor: Cursor? = context?.contentResolver?.query(
-            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            null, null, null, null
-        )
-
-        cursor?.let {
-            var count = 0
-            while (it.moveToNext() && count < 3) {
-                val name = it.getString(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-                val number = it.getString(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                val contactView = TextView(context)
-                contactView.text = "$name | $number"
-                contactsLayout.addView(contactView)
-                count++
-            }
-            it.close()
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS)
+            == PackageManager.PERMISSION_GRANTED) {
+            // 연락처 접근 코드
+            loadContacts()
+        } else {
+            // 권한이 없을 때의 처리
         }
+    }
+
+    private fun loadContacts() {
+        // 실제 연락처를 로드하는 코드
     }
 }

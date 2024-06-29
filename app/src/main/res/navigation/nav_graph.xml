@@ -60,7 +60,22 @@
         android:id="@+id/winterFragment"
         android:name="com.example.seasonsapp.WinterFragment"
         android:label="winter_fragment"
-        tools:layout="@layout/fragment_winter
-" />
+        tools:layout="@layout/fragment_winter" />
 
+    <fragment
+        android:id="@+id/albumFragment"
+        android:name="com.example.seasonsapp.AlbumFragment"
+        android:label="album_fragment"
+        tools:layout="@layout/fragment_album">
+    </fragment>
+
+    <fragment
+        android:id="@+id/musicPlayerFragment"
+        android:name="com.example.seasonsapp.MusicPlayerFragment"
+        android:label="music_player_fragment"
+        tools:layout="@layout/fragment_music_player">
+        <argument
+            android:name="albumResId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

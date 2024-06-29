@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">uma</string>
+    <!-- 기존 문자열 리소스들 -->
+    <string name="app_name">SeasonsApp</string>
+
+    <!-- 새로운 문자열 리소스 추가 -->
+    <string name="album_image">Album Image</string>
+    <string name="exit">Exit</string>
+    <string name="share">Share</string>
 </resources>

@@ -43,3 +43,32 @@ object Utils {
         return inSampleSize
     }
 }
+
+data class SongInfo(val title: String, val artist: String)
+
+val songInfos = mapOf(
+    R.raw.spr1 to SongInfo("Spring Song 1", "Artist A"),
+    R.raw.spr2 to SongInfo("Spring Song 2", "Artist B"),
+    R.raw.spr3 to SongInfo("Spring Song 3", "Artist C"),
+    R.raw.spr4 to SongInfo("Spring Song 4", "Artist D"),
+    R.raw.spr5 to SongInfo("Spring Song 5", "Artist E"),
+    R.raw.spr6 to SongInfo("Spring Song 6", "Artist F"),
+    R.raw.sum1 to SongInfo("Summer Song 1", "Artist G"),
+    R.raw.sum2 to SongInfo("Summer Song 2", "Artist G"),
+    R.raw.sum3 to SongInfo("Summer Song 3", "Artist G"),
+    R.raw.sum4 to SongInfo("Summer Song 4", "Artist G"),
+    R.raw.sum5 to SongInfo("Summer Song 5", "Artist G"),
+    R.raw.sum6 to SongInfo("Summer Song 6", "Artist G"),
+    R.raw.aut1 to SongInfo("Autumn Song 1", "Artist H"),
+    R.raw.aut2 to SongInfo("Autumn Song 2", "Artist H"),
+    R.raw.aut3 to SongInfo("Autumn Song 3", "Artist H"),
+    R.raw.aut4 to SongInfo("Autumn Song 4", "Artist H"),
+    R.raw.aut5 to SongInfo("Autumn Song 5", "Artist H"),
+    R.raw.aut6 to SongInfo("Autumn Song 6", "Artist H"),
+    R.raw.win1 to SongInfo("Winter Song 1", "Artist I"),
+    R.raw.win2 to SongInfo("Winter Song 2", "Artist I"),
+    R.raw.win3 to SongInfo("Winter Song 3", "Artist I"),
+    R.raw.win4 to SongInfo("Winter Song 4", "Artist I"),
+    R.raw.win5 to SongInfo("Winter Song 5", "Artist I"),
+    R.raw.win6 to SongInfo("Winter Song 6", "Artist I")
+)

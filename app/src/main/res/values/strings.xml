@@ -6,4 +6,6 @@
     <string name="album_image">Album Image</string>
     <string name="exit">Exit</string>
     <string name="share">Share</string>
+    <string name="song_title">Song Title</string>
+    <string name="song_artist">Song Artist</string>
 </resources>

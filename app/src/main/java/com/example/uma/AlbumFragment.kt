@@ -29,17 +29,19 @@ class AlbumFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_album, container, false)
+        return inflater.inflate(R.layout.fragment_album, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        // 계절에 맞는 이미지 및 노래 목록 설정
         val images = getImagesForSeason(season)
         val songs = getSongsForSeason(season)
         val adapter = AlbumAdapter(images, songs)
         recyclerView.adapter = adapter
-
-        return view
     }
 
     private fun getImagesForSeason(season: String): List<Int> {

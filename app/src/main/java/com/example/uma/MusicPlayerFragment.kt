@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 
@@ -38,6 +39,8 @@ class MusicPlayerFragment : Fragment() {
         val exitButton: ImageView = view.findViewById(R.id.exit_button)
         val shareButton: ImageView = view.findViewById(R.id.share_button)
         val albumImage: ImageView = view.findViewById(R.id.album_image)
+        val songTitle: TextView = view.findViewById(R.id.song_title)
+        val songArtist: TextView = view.findViewById(R.id.song_artist)
 
         exitButton.setOnClickListener {
             findNavController().navigateUp()
@@ -56,6 +59,11 @@ class MusicPlayerFragment : Fragment() {
         albumResId?.let {
             mediaPlayer = MediaPlayer.create(context, it)
             mediaPlayer.start()
+
+            // 곡 정보 설정
+            val songInfo = songInfos[it]
+            songTitle.text = songInfo?.title
+            songArtist.text = songInfo?.artist
         }
 
         imageResId?.let {

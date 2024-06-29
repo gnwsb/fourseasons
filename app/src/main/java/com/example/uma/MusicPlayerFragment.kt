@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 
-class MusicPlayerFragment : Fragment() {
+class MusicPlayerFragment : Fragment(), MediaPlayer.OnCompletionListener {
 
     private lateinit var mediaPlayer: MediaPlayer
     private var albumResId: Int? = null
@@ -43,6 +43,8 @@ class MusicPlayerFragment : Fragment() {
         val songArtist: TextView = view.findViewById(R.id.song_artist)
 
         exitButton.setOnClickListener {
+            mediaPlayer.stop()
+            mediaPlayer.release()
             findNavController().navigateUp()
         }
 
@@ -58,6 +60,7 @@ class MusicPlayerFragment : Fragment() {
 
         albumResId?.let {
             mediaPlayer = MediaPlayer.create(context, it)
+            mediaPlayer.setOnCompletionListener(this)
             mediaPlayer.start()
 
             // 곡 정보 설정
@@ -69,6 +72,10 @@ class MusicPlayerFragment : Fragment() {
         imageResId?.let {
             albumImage.setImageResource(it)
         }
+    }
+
+    override fun onCompletion(mp: MediaPlayer?) {
+        findNavController().navigateUp()
     }
 
     override fun onDestroy() {

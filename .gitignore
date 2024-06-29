@@ -1,0 +1,19 @@
+# Ignore Gradle files
+.gradle/
+
+# Ignore IDE specific files
+.idea/
+*.iml
+
+# Ignore build output directories
+/build/
+*/build/
+
+# Local configuration files
+local.properties
+
+# Ignore MacOS specific files
+.DS_Store
+
+# Ignore Linux specific files
+*~

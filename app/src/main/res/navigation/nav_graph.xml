@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loadingFragment">
+
+    <fragment
+        android:id="@+id/loadingFragment"
+        android:name="com.example.seasonsapp.LoadingFragment"
+        android:label="loading_fragment"
+        tools:layout="@layout/fragment_loading">
+        <action
+            android:id="@+id/action_loadingFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.seasonsapp.MainFragment"
+        android:label="main_fragment"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_springFragment"
+            app:destination="@id/springFragment"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_mainFragment_to_summerFragment"
+            app:destination="@id/summerFragment"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_mainFragment_to_autumnFragment"
+            app:destination="@id/autumnFragment"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_mainFragment_to_winterFragment"
+            app:destination="@id/winterFragment"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/springFragment"
+        android:name="com.example.seasonsapp.SpringFragment"
+        android:label="spring_fragment"
+        tools:layout="@layout/fragment_spring" />
+
+    <fragment
+        android:id="@+id/summerFragment"
+        android:name="com.example.seasonsapp.SummerFragment"
+        android:label="summer_fragment"
+        tools:layout="@layout/fragment_summer" />
+
+    <fragment
+        android:id="@+id/autumnFragment"
+        android:name="com.example.seasonsapp.AutumnFragment"
+        android:label="autumn_fragment"
+        tools:layout="@layout/fragment_autumn" />
+
+    <fragment
+        android:id="@+id/winterFragment"
+        android:name="com.example.seasonsapp.WinterFragment"
+        android:label="winter_fragment"
+        tools:layout="@layout/fragment_winter
+" />
+
+</navigation>

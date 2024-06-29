@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Theme.Uma" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <item name="windowNoTitle">true</item> <!-- 타이틀 바 숨김 -->
+        <item name="windowActionBar">true</item> <!-- 액션 바 숨김 -->
+    </style>
+
+</resources>

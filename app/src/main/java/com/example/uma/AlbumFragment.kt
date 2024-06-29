@@ -39,6 +39,15 @@ class AlbumFragment : Fragment() {
         val adapter = AlbumAdapter(images, songs, season)
         recyclerView.adapter = adapter
 
+        // 아이템 데코레이션 추가
+        val spacingInPixels = resources.getDimensionPixelSize(R.dimen.grid_spacing)
+        recyclerView.addItemDecoration(GridSpacingItemDecoration(2, spacingInPixels, true))
+
+
+        // RecyclerView 패딩 설정
+        recyclerView.setPadding(spacingInPixels, spacingInPixels, spacingInPixels, spacingInPixels)
+        recyclerView.clipToPadding = false
+
         return view
     }
 

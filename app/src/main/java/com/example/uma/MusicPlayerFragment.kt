@@ -1,8 +1,8 @@
+// MusicPlayerFragment.kt
 package com.example.seasonsapp
 
 import android.content.Intent
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +18,7 @@ class MusicPlayerFragment : Fragment() {
     private var albumResId: Int? = null
     private var imageResId: Int? = null
     private var season: String? = null
+    private var songInfo: SongInfo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,13 +65,13 @@ class MusicPlayerFragment : Fragment() {
         }
 
         shareButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "audio/*"
-                putExtra(Intent.EXTRA_STREAM, albumResId?.let { resId ->
-                    Uri.parse("android.resource://${requireContext().packageName}/$resId")
-                })
+            songInfo?.let { info ->
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, info.link)
+                }
+                startActivity(Intent.createChooser(intent, "Share Link"))
             }
-            startActivity(Intent.createChooser(intent, "Share Music"))
         }
 
         albumResId?.let {
@@ -81,7 +82,7 @@ class MusicPlayerFragment : Fragment() {
             mediaPlayer.start()
 
             // 곡 정보 설정
-            val songInfo = songInfos[it]
+            songInfo = songInfos[it]
             songTitle.text = songInfo?.title
             songArtist.text = songInfo?.artist
         }

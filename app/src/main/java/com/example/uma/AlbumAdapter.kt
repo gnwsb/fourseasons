@@ -8,7 +8,11 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.navigation.findNavController
 
-class AlbumAdapter(private val images: List<Int>, private val songs: List<Int>, private val season: String) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
+class AlbumAdapter(
+    private val images: List<Int>,
+    private val songs: List<Int>,
+    private val season: String
+) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
     class AlbumViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.imageView)

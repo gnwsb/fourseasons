@@ -2,11 +2,90 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center">
 
     <LinearLayout
-        android:id="@+id/contacts_layout"
-        android:layout_width="match_parent"
+        android:id="@+id/contact_1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="50dp">
+
+        <TextView
+            android:id="@+id/contact_1_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Contact 1 Name"
+            android:textSize="36sp"
+            android:fontFamily="@font/kopubmedium"/>
+
+        <TextView
+            android:id="@+id/contact_1_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Contact 1 Number"
+            android:textSize="24sp"
+            android:fontFamily="@font/kopublight" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/contact_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="50dp">
+
+        <TextView
+            android:id="@+id/contact_2_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Contact 2 Name"
+            android:textSize="36sp"
+            android:fontFamily="@font/kopubmedium" />
+
+        <TextView
+            android:id="@+id/contact_2_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Contact 2 Number"
+            android:textSize="24sp"
+            android:fontFamily="@font/kopublight" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/contact_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="50dp">
+
+        <TextView
+            android:id="@+id/contact_3_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Contact 3 Name"
+            android:textSize="36sp"
+            android:fontFamily="@font/kopubmedium" />
+
+        <TextView
+            android:id="@+id/contact_3_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Contact 3 Number"
+            android:textSize="24sp"
+            android:fontFamily="@font/kopublight" />
+    </LinearLayout>
 </LinearLayout>

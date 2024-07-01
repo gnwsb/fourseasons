@@ -1,6 +1,6 @@
 <resources>
     <!-- 기존 문자열 리소스들 -->
-    <string name="app_name">SeasonsApp</string>
+    <string name="app_name">사계</string>
 
     <!-- 새로운 문자열 리소스 추가 -->
     <string name="album_image">Album Image</string>

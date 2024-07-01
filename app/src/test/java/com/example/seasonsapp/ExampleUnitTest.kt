@@ -1,4 +1,4 @@
-package com.example.uma
+package com.example.seasonsapp
 
 import org.junit.Test
 

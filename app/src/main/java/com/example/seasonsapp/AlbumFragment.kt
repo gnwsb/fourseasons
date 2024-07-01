@@ -35,11 +35,11 @@ class AlbumFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_album, container, false)
         val imageViews = listOf(
             view.findViewById<ImageView>(R.id.imageView1),
-            view.findViewById<ImageView>(R.id.imageView2),
-            view.findViewById<ImageView>(R.id.imageView3),
-            view.findViewById<ImageView>(R.id.imageView4),
-            view.findViewById<ImageView>(R.id.imageView5),
-            view.findViewById<ImageView>(R.id.imageView6)
+            view.findViewById(R.id.imageView2),
+            view.findViewById(R.id.imageView3),
+            view.findViewById(R.id.imageView4),
+            view.findViewById(R.id.imageView5),
+            view.findViewById(R.id.imageView6)
         )
 
         val images = getImagesForSeason(season)

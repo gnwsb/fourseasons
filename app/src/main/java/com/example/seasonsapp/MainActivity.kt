@@ -43,10 +43,10 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == permissionsRequestReadContacts) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // 권한이 허용되었을 때 할 작업
-                // TODO: Add permission granted handling code
+                // Add permission granted handling code
             } else {
                 // 권한이 거부되었을 때 할 작업
-                // TODO: Add permission denied handling code
+                // Add permission denied handling code
             }
         }
     }

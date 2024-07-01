@@ -11,7 +11,7 @@ class SeasonPagerAdapter(fragment: Fragment, private val season: String) : Fragm
         return when (position) {
             0 -> ContactFragment.newInstance(season)
             1 -> AlbumFragment.newInstance(season)
-            2 -> EmptyFragment()
+            2 -> SeasonNoteFragment.newInstance(season)
             else -> throw IllegalStateException("Unexpected position $position")
         }
     }

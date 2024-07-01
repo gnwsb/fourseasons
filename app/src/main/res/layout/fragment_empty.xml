@@ -1,13 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFE1FE">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/sentenceContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp" />
+
+    <EditText
+        android:id="@+id/inputSentence"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="문장을 입력하세요 (최대 17자)"
+        android:maxLength="17"
+        android:inputType="text"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/addSentenceButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Empty Tab"
-        android:textSize="24sp" />
+        android:text="추가"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>

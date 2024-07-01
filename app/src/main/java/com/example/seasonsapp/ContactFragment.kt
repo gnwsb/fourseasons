@@ -14,6 +14,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.io.BufferedReader
@@ -23,7 +25,7 @@ import android.widget.LinearLayout
 class ContactFragment : Fragment() {
 
     private lateinit var season: String
-    private val REQUEST_CODE_READ_CONTACTS = 100
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
 
     companion object {
         fun newInstance(season: String): ContactFragment {
@@ -39,6 +41,18 @@ class ContactFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             season = it.getString("season") ?: ""
+        }
+
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            if (permissions.all { it.value }) {
+                // 권한이 부여되면 통화 기록을 로드
+                loadContacts()
+            } else {
+                // 권한이 거부되었을 때 처리
+                Toast.makeText(requireContext(), "통화 기록 및 연락처 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -60,20 +74,7 @@ class ContactFragment : Fragment() {
             loadContacts()
         } else {
             // 권한 요청
-            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS), REQUEST_CODE_READ_CONTACTS)
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_READ_CONTACTS) {
-            if ((grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED })) {
-                // 권한이 부여되면 통화 기록을 로드
-                loadContacts()
-            } else {
-                // 권한이 거부되었을 때 처리
-                Toast.makeText(requireContext(), "통화 기록 및 연락처 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
+            requestPermissionLauncher.launch(arrayOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS))
         }
     }
 

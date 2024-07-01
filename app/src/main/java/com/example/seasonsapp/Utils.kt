@@ -1,49 +1,5 @@
 package com.example.seasonsapp
 
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-
-object Utils {
-    fun decodeSampledBitmapFromResource(
-        res: Resources, resId: Int, reqWidth: Int, reqHeight: Int
-    ): Bitmap {
-        // First decode with inJustDecodeBounds=true to check dimensions
-        val options = BitmapFactory.Options().apply {
-            inJustDecodeBounds = true
-        }
-        BitmapFactory.decodeResource(res, resId, options)
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false
-        return BitmapFactory.decodeResource(res, resId, options)
-    }
-
-    private fun calculateInSampleSize(
-        options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int
-    ): Int {
-        // Raw height and width of image
-        val (height: Int, width: Int) = options.run { outHeight to outWidth }
-        var inSampleSize = 1
-
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight: Int = height / 2
-            val halfWidth: Int = width / 2
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-                inSampleSize *= 2
-            }
-        }
-
-        return inSampleSize
-    }
-}
-
 data class SongInfo(val title: String, val artist: String, val link: String)
 
 val songInfos = mapOf(
@@ -56,7 +12,7 @@ val songInfos = mapOf(
     R.raw.sum1 to SongInfo("For You", "Tatsuro Yamashita", "https://music.youtube.com/watch?v=BZ9Ib2zSqSk&si=APARDK6jD9uZ-cbj"),
     R.raw.sum2 to SongInfo("Masked Dancers: ...", "Brave Little Abacus", "https://open.spotify.com/album/5UiQKq5B5Y3J4Qepcx2ioK?si=82b0e3b2cb2245ac"),
     R.raw.sum3 to SongInfo("To See the Next Part...", "파란노을", "https://open.spotify.com/album/5IyHtkKQvafw7bQYFnx4FO?si=f4bcbc03758849eb"),
-    R.raw.sum4 to SongInfo("To Pimp a Butterfly", "Kendrick Lamar", "https://open.spotify.com/album/7ycBtnsMtyVbbwTfJwRjSP?si=9f8fdbbee6004430"),
+    R.raw.sum4 to SongInfo("To Pimp A Butterfly", "Kendrick Lamar", "https://open.spotify.com/album/7ycBtnsMtyVbbwTfJwRjSP?si=9f8fdbbee6004430"),
     R.raw.sum5 to SongInfo("서울병", "쏜애플", "https://open.spotify.com/album/0glXbKYknQlnd2FnxsxWez?si=00ae4b503f4b42dc"),
     R.raw.sum6 to SongInfo("スウィートソウル EP", "Kirinji", "https://open.spotify.com/album/4oYbhdzJaeH0g7i95DMcjp?si=FGMtxZ-mRNa41jCO7dc8Zg"),
     R.raw.aut1 to SongInfo("Kind of Blue", "Miles Davis", "https://open.spotify.com/album/1weenld61qoidwYuZ1GESA?si=792f2dc6a23c43ba"),

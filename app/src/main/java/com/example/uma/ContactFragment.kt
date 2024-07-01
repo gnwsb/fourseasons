@@ -18,7 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import kotlin.random.Random
+import android.widget.LinearLayout
 
 class ContactFragment : Fragment() {
 
@@ -78,16 +78,20 @@ class ContactFragment : Fragment() {
     }
 
     private fun loadContacts() {
+        val contact1Layout = view?.findViewById<LinearLayout>(R.id.contact_1)
         val contact1NameTextView = view?.findViewById<TextView>(R.id.contact_1_name)
         val contact1NumberTextView = view?.findViewById<TextView>(R.id.contact_1_number)
+        val contact2Layout = view?.findViewById<LinearLayout>(R.id.contact_2)
         val contact2NameTextView = view?.findViewById<TextView>(R.id.contact_2_name)
         val contact2NumberTextView = view?.findViewById<TextView>(R.id.contact_2_number)
+        val contact3Layout = view?.findViewById<LinearLayout>(R.id.contact_3)
         val contact3NameTextView = view?.findViewById<TextView>(R.id.contact_3_name)
         val contact3NumberTextView = view?.findViewById<TextView>(R.id.contact_3_number)
 
         val callLogs = getCallLogs()
         if (callLogs.isNotEmpty()) {
             val sortedContacts = callLogs.entries.sortedByDescending { it.value }.take(3)
+            val contactLayouts = listOf(contact1Layout, contact2Layout, contact3Layout)
             val contactNameViews = listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
             val contactNumberViews = listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
             for ((index, entry) in sortedContacts.withIndex()) {
@@ -96,12 +100,13 @@ class ContactFragment : Fragment() {
                 val formattedNumber = formatPhoneNumber(number)
                 contactNameViews[index]?.text = contactName
                 contactNumberViews[index]?.text = formattedNumber
-                contactNumberViews[index]?.setOnClickListener {
+                contactLayouts[index]?.setOnClickListener {
                     sendSmsWithSeasonPoem(number)
                 }
             }
         } else {
             val randomContacts = getRandomContacts()
+            val contactLayouts = listOf(contact1Layout, contact2Layout, contact3Layout)
             val contactNameViews = listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
             val contactNumberViews = listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
             for ((index, contact) in randomContacts.withIndex()) {
@@ -109,7 +114,7 @@ class ContactFragment : Fragment() {
                 val formattedNumber = formatPhoneNumber(number)
                 contactNameViews[index]?.text = name
                 contactNumberViews[index]?.text = formattedNumber
-                contactNumberViews[index]?.setOnClickListener {
+                contactLayouts[index]?.setOnClickListener {
                     sendSmsWithSeasonPoem(number)
                 }
             }

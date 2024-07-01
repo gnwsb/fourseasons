@@ -1,4 +1,3 @@
-// MusicPlayerFragment.kt
 package com.example.seasonsapp
 
 import android.content.Intent
@@ -45,17 +44,17 @@ class MusicPlayerFragment : Fragment() {
         val songTitle: TextView = view.findViewById(R.id.song_title)
         val songArtist: TextView = view.findViewById(R.id.song_artist)
 
-        // 배경색 설정
+        // 배경 이미지 설정
         val rootView: View = view.findViewById(R.id.music_player_root)
         season?.let {
-            val backgroundColor = when (it.lowercase()) {
-                "spring" -> R.color.springColor
-                "summer" -> R.color.summerColor
-                "autumn" -> R.color.autumnColor
-                "winter" -> R.color.winterColor
-                else -> R.color.springColor
+            val backgroundDrawable = when (it.lowercase()) {
+                "spring" -> R.drawable.sprb
+                "summer" -> R.drawable.sumb
+                "autumn" -> R.drawable.autb
+                "winter" -> R.drawable.winb
+                else -> R.drawable.sprb
             }
-            rootView.setBackgroundColor(resources.getColor(backgroundColor, null))
+            rootView.setBackgroundResource(backgroundDrawable)
         }
 
         exitButton.setOnClickListener {

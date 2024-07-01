@@ -2,11 +2,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center">
 
-    <LinearLayout
-        android:id="@+id/contacts_layout"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/contact_1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
+        android:gravity="center"
+        android:text="Contact 1"
+        android:textSize="36sp" />
+
+    <TextView
+        android:id="@+id/contact_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="36sp"
+        android:text="Contact 2"
+        android:gravity="center"
+        android:layout_marginBottom="50dp"/>
+
+    <TextView
+        android:id="@+id/contact_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="36sp"
+        android:text="Contact 3"
+        android:gravity="center"
+        android:layout_marginBottom="50dp"/>
 </LinearLayout>

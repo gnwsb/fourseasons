@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.findNavController
 
 class AlbumFragment : Fragment() {
     private lateinit var season: String
@@ -33,19 +33,29 @@ class AlbumFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_album, container, false)
-        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        val imageViews = listOf(
+            view.findViewById<ImageView>(R.id.imageView1),
+            view.findViewById<ImageView>(R.id.imageView2),
+            view.findViewById<ImageView>(R.id.imageView3),
+            view.findViewById<ImageView>(R.id.imageView4),
+            view.findViewById<ImageView>(R.id.imageView5),
+            view.findViewById<ImageView>(R.id.imageView6)
+        )
 
         val images = getImagesForSeason(season)
         val songs = getSongsForSeason(season)
-        val adapter = AlbumAdapter(images, songs, season)
-        recyclerView.adapter = adapter
 
-        val spacingInPixels = resources.getDimensionPixelSize(R.dimen.grid_spacing)
-        recyclerView.addItemDecoration(GridSpacingItemDecoration(2, spacingInPixels, true))
-
-        recyclerView.setPadding(spacingInPixels, spacingInPixels, spacingInPixels, spacingInPixels)
-        recyclerView.clipToPadding = false
+        for (i in images.indices) {
+            imageViews[i].setImageResource(images[i])
+            imageViews[i].setOnClickListener {
+                val bundle = Bundle().apply {
+                    putInt("albumResId", songs[i])
+                    putInt("imageResId", images[i])
+                    putString("season", season)
+                }
+                it.findNavController().navigate(R.id.musicPlayerFragment, bundle)
+            }
+        }
 
         return view
     }

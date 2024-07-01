@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.CallLog
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,6 @@ import androidx.fragment.app.Fragment
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.random.Random
-import android.util.Log
 
 class ContactFragment : Fragment() {
 
@@ -78,29 +78,38 @@ class ContactFragment : Fragment() {
     }
 
     private fun loadContacts() {
-        val contact1TextView = view?.findViewById<TextView>(R.id.contact_1)
-        val contact2TextView = view?.findViewById<TextView>(R.id.contact_2)
-        val contact3TextView = view?.findViewById<TextView>(R.id.contact_3)
+        val contact1NameTextView = view?.findViewById<TextView>(R.id.contact_1_name)
+        val contact1NumberTextView = view?.findViewById<TextView>(R.id.contact_1_number)
+        val contact2NameTextView = view?.findViewById<TextView>(R.id.contact_2_name)
+        val contact2NumberTextView = view?.findViewById<TextView>(R.id.contact_2_number)
+        val contact3NameTextView = view?.findViewById<TextView>(R.id.contact_3_name)
+        val contact3NumberTextView = view?.findViewById<TextView>(R.id.contact_3_number)
 
         val callLogs = getCallLogs()
         if (callLogs.isNotEmpty()) {
             val sortedContacts = callLogs.entries.sortedByDescending { it.value }.take(3)
-            val contactViews = listOf(contact1TextView, contact2TextView, contact3TextView)
+            val contactNameViews = listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
+            val contactNumberViews = listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
             for ((index, entry) in sortedContacts.withIndex()) {
                 val (number, _) = entry
                 val contactName = getContactName(number) ?: "Unknown"
-                contactViews[index]?.text = "$contactName\n$number"
-                contactViews[index]?.setOnClickListener {
+                val formattedNumber = formatPhoneNumber(number)
+                contactNameViews[index]?.text = contactName
+                contactNumberViews[index]?.text = formattedNumber
+                contactNumberViews[index]?.setOnClickListener {
                     sendSmsWithSeasonPoem(number)
                 }
             }
         } else {
             val randomContacts = getRandomContacts()
-            val contactViews = listOf(contact1TextView, contact2TextView, contact3TextView)
+            val contactNameViews = listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
+            val contactNumberViews = listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
             for ((index, contact) in randomContacts.withIndex()) {
                 val (name, number) = contact
-                contactViews[index]?.text = "$name\n$number"
-                contactViews[index]?.setOnClickListener {
+                val formattedNumber = formatPhoneNumber(number)
+                contactNameViews[index]?.text = name
+                contactNumberViews[index]?.text = formattedNumber
+                contactNumberViews[index]?.setOnClickListener {
                     sendSmsWithSeasonPoem(number)
                 }
             }
@@ -250,5 +259,29 @@ class ContactFragment : Fragment() {
         }
     }
 
-
+    private fun formatPhoneNumber(phoneNumber: String): String {
+        return when {
+            phoneNumber.length == 11 && phoneNumber.startsWith("010") -> {
+                // 010-XXXX-XXXX
+                "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 7)}-${phoneNumber.substring(7)}"
+            }
+            phoneNumber.length == 10 && phoneNumber.startsWith("02") -> {
+                // 02-XXXX-XXXX
+                "${phoneNumber.substring(0, 2)}-${phoneNumber.substring(2, 6)}-${phoneNumber.substring(6)}"
+            }
+            phoneNumber.length == 10 -> {
+                // 0XX-XXX-XXXX
+                "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 6)}-${phoneNumber.substring(6)}"
+            }
+            phoneNumber.length == 9 && phoneNumber.startsWith("02") -> {
+                // 02-XXX-XXXX
+                "${phoneNumber.substring(0, 2)}-${phoneNumber.substring(2, 5)}-${phoneNumber.substring(5)}"
+            }
+            phoneNumber.length == 9 -> {
+                // 0XX-XXX-XXX
+                "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 5)}-${phoneNumber.substring(5)}"
+            }
+            else -> phoneNumber
+        }
+    }
 }

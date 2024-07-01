@@ -6,4 +6,8 @@
     <color name="summerColor">#FFF7E1</color>
     <color name="autumnColor">#FFDCB9</color>
     <color name="winterColor">#D5F5FF</color>
+    <color name="spColor">#FF216B</color>
+    <color name="suColor">#008E1E</color>
+    <color name="auColor">#C04F15</color>
+    <color name="wiColor">#8BC5F5</color>
 </resources>

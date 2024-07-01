@@ -28,7 +28,7 @@ class AutumnFragment : Fragment() {
 
         // ViewPager2 컨텐츠만 페이드인 애니메이션 적용
         viewPager.post {
-            viewPager.animate().alpha(1f).duration = 800
+            viewPager.animate().alpha(1f).duration = 400
         }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

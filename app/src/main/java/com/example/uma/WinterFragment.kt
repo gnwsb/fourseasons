@@ -30,5 +30,14 @@ class WinterFragment : Fragment() {
         viewPager.post {
             viewPager.animate().alpha(1f).duration = 800
         }
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                if (position == 1) { // 두 번째 탭에서 세 번째 탭으로 스크롤할 때
+                    val seasonNoteFragment = childFragmentManager.findFragmentByTag("f2") as? SeasonNoteFragment
+                    seasonNoteFragment?.setSeasonBackgroundAlpha(positionOffset)
+                }
+            }
+        })
     }
 }

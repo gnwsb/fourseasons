@@ -8,4 +8,7 @@
     <string name="share">Share</string>
     <string name="song_title">Song Title</string>
     <string name="song_artist">Song Artist</string>
+    <string name="season_background">Season Background</string>
+    <string name="season_title">나의 %1$s은</string>
+    <string name="tree_image">Tree Image</string>
 </resources>

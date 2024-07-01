@@ -48,7 +48,7 @@ data class SongInfo(val title: String, val artist: String, val link: String)
 
 val songInfos = mapOf(
     R.raw.spr1 to SongInfo("이소라 7집", "이소라", "https://open.spotify.com/album/25evl4uFTZnYnLcUwrl0Oa?si=Jvfwzi0cQBK2sbx8BhF03g"),
-    R.raw.spr2 to SongInfo("Ants from Up There", "lack Country, New Road", "https://open.spotify.com/album/21xp7NdU1ajmO1CX0w2Egd?si=9e2f629f83294376"),
+    R.raw.spr2 to SongInfo("Ants from Up There", "Black Country, New Road", "https://open.spotify.com/album/21xp7NdU1ajmO1CX0w2Egd?si=9e2f629f83294376"),
     R.raw.spr3 to SongInfo("ハチミツ", "Spitz", "https://open.spotify.com/album/4mz1WjnsW88FxFfvtrfIAd?si=FSdQji_TSbWzHSU_rkffCg"),
     R.raw.spr4 to SongInfo("Javelin", "Sufjan Stevens", "https://open.spotify.com/album/2KqSL3vLfyVO7rrZJL9tUs?si=314f4a0717fe4613"),
     R.raw.spr5 to SongInfo("ロンググッドバイ", "Kinoko Teikoku", "https://open.spotify.com/album/2qqwUNewGqmBiV7jUdqqQd?si=81ZwTWtQQxmSrjYmGOSnxQ"),

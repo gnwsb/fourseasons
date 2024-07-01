@@ -2,18 +2,31 @@ package com.example.seasonsapp
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.InputType
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 
 class SeasonNoteFragment : Fragment() {
 
     private lateinit var season: String
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var notesContainer: LinearLayout
+    private lateinit var backgroundImageView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +37,7 @@ class SeasonNoteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_spring_note, container, false)
+        return inflater.inflate(R.layout.fragment_season_note, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,17 +46,28 @@ class SeasonNoteFragment : Fragment() {
         sharedPreferences = requireContext().getSharedPreferences("seasons_prefs", Context.MODE_PRIVATE)
 
         val titleTextView = view.findViewById<TextView>(R.id.titleTextView)
-        val inputEditText = view.findViewById<EditText>(R.id.inputEditText)
+        backgroundImageView = view.findViewById(R.id.season_background)
+        notesContainer = view.findViewById(R.id.notesContainer)
 
-        titleTextView.text = "나의 ${getSeasonName(season)}은"
+        val seasonName = getSeasonName(season)
+        val titleText = getString(R.string.season_title, seasonName)
+        titleTextView.text = titleText
 
-        val savedText = sharedPreferences.getString("${season}_text", "")
-        inputEditText.setText(savedText)
+        // Apply styles to the title text
+        val seasonIndex = titleText.indexOf(seasonName)
+        val spannable = SpannableString(titleText).apply {
+            setSpan(ForegroundColorSpan(resources.getColor(android.R.color.white)), seasonIndex, seasonIndex + seasonName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), seasonIndex, seasonIndex + seasonName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        titleTextView.text = spannable
+        titleTextView.setTextColor(resources.getColor(android.R.color.black))
 
-        inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                sharedPreferences.edit().putString("${season}_text", inputEditText.text.toString()).apply()
-            }
+        backgroundImageView.setImageDrawable(getSeasonDrawable(season))
+
+        loadNotes()
+
+        view.setOnClickListener {
+            addNewNote()
         }
     }
 
@@ -55,6 +79,95 @@ class SeasonNoteFragment : Fragment() {
             "winter" -> "겨울"
             else -> "봄"
         }
+    }
+
+    private fun getSeasonDrawable(season: String): Drawable? {
+        val resId = when (season) {
+            "spring" -> R.drawable.spr31
+            "summer" -> R.drawable.sum31
+            "autumn" -> R.drawable.aut31
+            "winter" -> R.drawable.win31
+            else -> R.drawable.spr31
+        }
+        return ResourcesCompat.getDrawable(resources, resId, null)
+    }
+
+    private fun loadNotes() {
+        val notes = sharedPreferences.getStringSet("${season}_notes", emptySet()) ?: return
+        notesContainer.removeAllViews()
+        notes.forEach {
+            val textView = TextView(context).apply {
+                text = it
+                setTextAppearance(R.style.NoteTextStyle)
+                gravity = View.TEXT_ALIGNMENT_CENTER
+            }
+            notesContainer.addView(textView)
+        }
+    }
+
+    private fun addNewNote() {
+        if (notesContainer.childCount >= 6) return
+
+        val noteLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+
+        val editText = EditText(context).apply {
+            hint = "Enter your note"
+            maxLines = 1
+            inputType = InputType.TYPE_CLASS_TEXT
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+
+        val saveButton = TextView(context).apply {
+            text = "Save"
+            setTextColor(resources.getColor(android.R.color.holo_blue_light))
+            setPadding(8, 8, 8, 8)
+            setOnClickListener {
+                val enteredText = editText.text.toString()
+                if (enteredText.isNotEmpty()) {
+                    saveNoteToPreferences(enteredText)
+                    val textView = TextView(context).apply {
+                        text = enteredText
+                        setTextAppearance(R.style.NoteTextStyle)
+                        gravity = View.TEXT_ALIGNMENT_CENTER
+                    }
+                    notesContainer.addView(textView)
+                    notesContainer.removeView(noteLayout)
+                } else {
+                    notesContainer.removeView(noteLayout)
+                }
+                hideKeyboard()
+            }
+        }
+
+        noteLayout.addView(editText)
+        noteLayout.addView(saveButton)
+
+        notesContainer.addView(noteLayout)
+
+        editText.requestFocus()
+        showKeyboard()
+    }
+
+    private fun saveNoteToPreferences(note: String) {
+        val notes = sharedPreferences.getStringSet("${season}_notes", mutableSetOf())?.toMutableSet()
+        notes?.add(note)
+        sharedPreferences.edit().putStringSet("${season}_notes", notes).apply()
+    }
+
+    private fun showKeyboard() {
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    private fun hideKeyboard() {
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    }
+
+    fun setSeasonBackgroundAlpha(alpha: Float) {
+        backgroundImageView.alpha = alpha
     }
 
     companion object {

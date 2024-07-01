@@ -8,8 +8,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="사계"
-        android:textSize="40sp"
+        android:textSize="50sp"
         android:layout_centerInParent="true"
-        android:fontFamily="@font/kopubmedium"
+        android:fontFamily="@font/dxdx"
         android:textColor="@android:color/black"/>
 </RelativeLayout>

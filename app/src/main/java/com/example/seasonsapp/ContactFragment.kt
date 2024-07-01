@@ -14,8 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.io.BufferedReader
@@ -25,7 +23,7 @@ import android.widget.LinearLayout
 class ContactFragment : Fragment() {
 
     private lateinit var season: String
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private val REQUEST_CODE_READ_CONTACTS = 100
 
     companion object {
         fun newInstance(season: String): ContactFragment {
@@ -42,18 +40,6 @@ class ContactFragment : Fragment() {
         arguments?.let {
             season = it.getString("season") ?: ""
         }
-
-        requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            if (permissions.all { it.value }) {
-                // 권한이 부여되면 통화 기록을 로드
-                loadContacts()
-            } else {
-                // 권한이 거부되었을 때 처리
-                Toast.makeText(requireContext(), "통화 기록 및 연락처 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     override fun onCreateView(
@@ -69,12 +55,36 @@ class ContactFragment : Fragment() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CALL_LOG)
             == PackageManager.PERMISSION_GRANTED &&
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             // 통화 기록 접근 코드
             loadContacts()
         } else {
             // 권한 요청
-            requestPermissionLauncher.launch(arrayOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS))
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.READ_CONTACTS
+                ), REQUEST_CODE_READ_CONTACTS
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_READ_CONTACTS) {
+            if ((grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED })) {
+                // 권한이 부여되면 통화 기록을 로드
+                loadContacts()
+            } else {
+                // 권한이 거부되었을 때 처리
+                Toast.makeText(requireContext(), "통화 기록 및 연락처 접근 권한이 필요합니다.", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
@@ -90,16 +100,19 @@ class ContactFragment : Fragment() {
         val contact3NumberTextView = view?.findViewById<TextView>(R.id.contact_3_number)
 
         val callLogs = getCallLogs()
+        val contactLayouts = listOf(contact1Layout, contact2Layout, contact3Layout)
+        val contactNameViews =
+            listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
+        val contactNumberViews =
+            listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
+
         if (callLogs.isNotEmpty()) {
             val sortedContacts = callLogs.entries.sortedByDescending { it.value }.take(3)
-            val contactLayouts = listOf(contact1Layout, contact2Layout, contact3Layout)
-            val contactNameViews = listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
-            val contactNumberViews = listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
             for ((index, entry) in sortedContacts.withIndex()) {
                 val (number, _) = entry
-                val contactName = getContactName(number) ?: "Unknown"
+                val contactName = getContactName(number)
                 val formattedNumber = formatPhoneNumber(number)
-                contactNameViews[index]?.text = contactName
+                contactNameViews[index]?.text = contactName ?: ""
                 contactNumberViews[index]?.text = formattedNumber
                 contactLayouts[index]?.setOnClickListener {
                     sendSmsWithSeasonPoem(number)
@@ -107,9 +120,6 @@ class ContactFragment : Fragment() {
             }
         } else {
             val randomContacts = getRandomContacts()
-            val contactLayouts = listOf(contact1Layout, contact2Layout, contact3Layout)
-            val contactNameViews = listOf(contact1NameTextView, contact2NameTextView, contact3NameTextView)
-            val contactNumberViews = listOf(contact1NumberTextView, contact2NumberTextView, contact3NumberTextView)
             for ((index, contact) in randomContacts.withIndex()) {
                 val (name, number) = contact
                 val formattedNumber = formatPhoneNumber(number)
@@ -161,9 +171,13 @@ class ContactFragment : Fragment() {
     }
 
     private fun getContactName(phoneNumber: String): String? {
-        val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber))
+        val uri = Uri.withAppendedPath(
+            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+            Uri.encode(phoneNumber)
+        )
         val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
-        val cursor: Cursor? = requireActivity().contentResolver.query(uri, projection, null, null, null)
+        val cursor: Cursor? =
+            requireActivity().contentResolver.query(uri, projection, null, null, null)
 
         cursor?.use {
             if (it.moveToFirst()) {
@@ -174,7 +188,8 @@ class ContactFragment : Fragment() {
     }
 
     private fun getRandomContacts(): List<Pair<String, String>> {
-        val projection = arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
+        val projection =
+            arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
         val cursor: Cursor? = requireActivity().contentResolver.query(
             ContactsContract.Contacts.CONTENT_URI,
             projection,
@@ -187,7 +202,8 @@ class ContactFragment : Fragment() {
         cursor?.use {
             while (it.moveToNext()) {
                 val contactId = it.getLong(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
+                val name =
+                    it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
                 val phoneNumber = getPhoneNumber(contactId)
 
                 if (phoneNumber != null) {
@@ -239,10 +255,35 @@ class ContactFragment : Fragment() {
         }
 
         val files = when (season) {
-            "spring" -> arrayOf("spp1.txt", "spp2.txt", "spp3.txt", "spp4.txt", "spp5.txt", "spp6.txt")
-            "summer" -> arrayOf("sup1.txt", "sup2.txt", "sup3.txt", "sup4.txt", "sup5.txt", "sup6.txt")
+            "spring" -> arrayOf(
+                "spp1.txt",
+                "spp2.txt",
+                "spp3.txt",
+                "spp4.txt",
+                "spp5.txt",
+                "spp6.txt"
+            )
+
+            "summer" -> arrayOf(
+                "sup1.txt",
+                "sup2.txt",
+                "sup3.txt",
+                "sup4.txt",
+                "sup5.txt",
+                "sup6.txt"
+            )
+
             "autumn" -> arrayOf("ap1.txt", "ap2.txt", "ap3.txt", "ap4.txt", "ap5.txt", "ap6.txt")
-            "winter" -> arrayOf("wp1.txt", "wp2.txt", "wp3.txt", "wp4.txt", "wp5.txt", "wp6.txt", "wp7.txt")
+            "winter" -> arrayOf(
+                "wp1.txt",
+                "wp2.txt",
+                "wp3.txt",
+                "wp4.txt",
+                "wp5.txt",
+                "wp6.txt",
+                "wp7.txt"
+            )
+
             else -> arrayOf()
         }
 
@@ -269,24 +310,54 @@ class ContactFragment : Fragment() {
         return when {
             phoneNumber.length == 11 && phoneNumber.startsWith("010") -> {
                 // 010-XXXX-XXXX
-                "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 7)}-${phoneNumber.substring(7)}"
+                "${phoneNumber.substring(0, 3)}-${
+                    phoneNumber.substring(
+                        3,
+                        7
+                    )
+                }-${phoneNumber.substring(7)}"
             }
+
             phoneNumber.length == 10 && phoneNumber.startsWith("02") -> {
                 // 02-XXXX-XXXX
-                "${phoneNumber.substring(0, 2)}-${phoneNumber.substring(2, 6)}-${phoneNumber.substring(6)}"
+                "${phoneNumber.substring(0, 2)}-${
+                    phoneNumber.substring(
+                        2,
+                        6
+                    )
+                }-${phoneNumber.substring(6)}"
             }
+
             phoneNumber.length == 10 -> {
                 // 0XX-XXX-XXXX
-                "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 6)}-${phoneNumber.substring(6)}"
+                "${phoneNumber.substring(0, 3)}-${
+                    phoneNumber.substring(
+                        3,
+                        6
+                    )
+                }-${phoneNumber.substring(6)}"
             }
+
             phoneNumber.length == 9 && phoneNumber.startsWith("02") -> {
                 // 02-XXX-XXXX
-                "${phoneNumber.substring(0, 2)}-${phoneNumber.substring(2, 5)}-${phoneNumber.substring(5)}"
+                "${phoneNumber.substring(0, 2)}-${
+                    phoneNumber.substring(
+                        2,
+                        5
+                    )
+                }-${phoneNumber.substring(5)}"
             }
+
             phoneNumber.length == 9 -> {
                 // 0XX-XXX-XXX
-                "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 5)}-${phoneNumber.substring(5)}"
+                "${phoneNumber.substring(0, 3)}-${
+                    phoneNumber.substring(
+                        3,
+                        5
+                    )
+                }-${phoneNumber.substring(5)}"
             }
+
             else -> phoneNumber
         }
     }

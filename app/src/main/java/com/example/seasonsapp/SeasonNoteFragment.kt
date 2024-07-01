@@ -61,8 +61,8 @@ class SeasonNoteFragment : Fragment() {
 
         // 빈 공간 클릭 시 새로운 노트 추가 및 키보드 표시
         view.setOnClickListener {
-            if (!isAddingNote) {
-                addNewNoteWithFocus()
+            if (!isAddingNote && notesContainer.childCount < 6) {
+                addNewNote()
             }
         }
     }
@@ -135,83 +135,77 @@ class SeasonNoteFragment : Fragment() {
         }
     }
 
-    private fun addNewNoteWithFocus() {
-        if (notesContainer.childCount >= 6) return
+    private fun addNewNote() {
+        if (isAddingNote || notesContainer.childCount >= 6) return
 
         isAddingNote = true
 
-        val editText = EditText(context).apply {
-            hint = "당신의 계절을 입력하세요"
-            maxLines = 1
-            inputType = InputType.TYPE_CLASS_TEXT
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            gravity = View.TEXT_ALIGNMENT_CENTER
-            textAlignment = View.TEXT_ALIGNMENT_CENTER
-            imeOptions = EditorInfo.IME_ACTION_DONE
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    val enteredText = text.toString()
-                    if (enteredText.isNotEmpty()) {
-                        saveNoteToPreferences(enteredText)
-                        val textView = TextView(context).apply {
-                            text = enteredText
-                            setTextAppearance(R.style.NoteTextStyle)
-                            gravity = View.TEXT_ALIGNMENT_CENTER
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                setMargins(0, 48, 0, 48) // Add top and bottom margins
-                            }
-                            setOnClickListener { editNoteTextView(this) }
-                        }
-                        notesContainer.addView(textView)
+        view?.post {
+            val editText = EditText(requireContext()).apply {
+                hint = "당신의 계절을 입력하세요"
+                maxLines = 1
+                inputType = InputType.TYPE_CLASS_TEXT
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 48, 0, 48)
+                }
+                gravity = View.TEXT_ALIGNMENT_CENTER
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                imeOptions = EditorInfo.IME_ACTION_DONE
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        saveNote(this)
+                        true
+                    } else {
+                        false
                     }
-                    notesContainer.removeView(this)
-                    isAddingNote = false
-                    hideKeyboard()
-                    true
-                } else {
-                    false
+                }
+                setOnKeyListener { _, keyCode, event ->
+                    if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+                        saveNote(this)
+                        true
+                    } else {
+                        false
+                    }
                 }
             }
-            setOnKeyListener { _, keyCode, event ->
-                if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    val enteredText = text.toString()
-                    if (enteredText.isNotEmpty()) {
-                        saveNoteToPreferences(enteredText)
-                        val textView = TextView(context).apply {
-                            text = enteredText
-                            setTextAppearance(R.style.NoteTextStyle)
-                            gravity = View.TEXT_ALIGNMENT_CENTER
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                setMargins(0, 48, 0, 48) // Add top and bottom margins
-                            }
-                            setOnClickListener { editNoteTextView(this) }
-                        }
-                        notesContainer.addView(textView)
-                    }
-                    notesContainer.removeView(this)
-                    isAddingNote = false
-                    hideKeyboard()
-                    true
-                } else {
-                    false
-                }
-            }
-        }
 
-        notesContainer.addView(editText)
-        editText.requestFocus()
-        showKeyboard()
+            notesContainer.addView(editText)
+            editText.requestFocus()
+
+            view?.postDelayed({
+                showKeyboard(editText)
+            }, 100)
+        }
+    }
+
+    private fun saveNote(editText: EditText) {
+        val enteredText = editText.text.toString().trim()
+        if (enteredText.isNotEmpty()) {
+            saveNoteToPreferences(enteredText)
+            val textView = TextView(requireContext()).apply {
+                text = enteredText
+                setTextAppearance(R.style.NoteTextStyle)
+                gravity = View.TEXT_ALIGNMENT_CENTER
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 48, 0, 48)
+                }
+                setOnClickListener { editNoteTextView(this) }
+            }
+            val index = notesContainer.indexOfChild(editText)
+            notesContainer.removeView(editText)
+            notesContainer.addView(textView, index)
+        } else {
+            notesContainer.removeView(editText)
+        }
+        isAddingNote = false
+        hideKeyboard()
     }
 
     private fun editNoteTextView(textView: TextView) {
@@ -296,7 +290,7 @@ class SeasonNoteFragment : Fragment() {
         notesContainer.addView(editText, currentIndex)
         editText.requestFocus()
         editText.setSelection(editText.text.length)
-        showKeyboard()
+        showKeyboard(editText)
     }
 
     private fun saveNoteToPreferences(note: String) {
@@ -320,14 +314,14 @@ class SeasonNoteFragment : Fragment() {
         }
     }
 
-    private fun showKeyboard() {
-        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    private fun showKeyboard(view: View) {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun hideKeyboard() {
-        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        view?.let { imm.hideSoftInputFromWindow(it.windowToken, 0) }
     }
 
     fun setSeasonBackgroundAlpha(alpha: Float) {

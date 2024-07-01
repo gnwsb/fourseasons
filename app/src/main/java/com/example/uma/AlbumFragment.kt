@@ -28,16 +28,24 @@ class AlbumFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_album, container, false)
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        // 계절에 맞는 이미지 및 노래 목록 설정
         val images = getImagesForSeason(season)
         val songs = getSongsForSeason(season)
-        val adapter = AlbumAdapter(images, songs)
+        val adapter = AlbumAdapter(images, songs, season)
         recyclerView.adapter = adapter
+
+        val spacingInPixels = resources.getDimensionPixelSize(R.dimen.grid_spacing)
+        recyclerView.addItemDecoration(GridSpacingItemDecoration(2, spacingInPixels, true))
+
+        recyclerView.setPadding(spacingInPixels, spacingInPixels, spacingInPixels, spacingInPixels)
+        recyclerView.clipToPadding = false
 
         return view
     }

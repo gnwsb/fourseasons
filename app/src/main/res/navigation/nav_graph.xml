@@ -78,4 +78,6 @@
             android:name="albumResId"
             app:argType="integer" />
     </fragment>
+
+
 </navigation>

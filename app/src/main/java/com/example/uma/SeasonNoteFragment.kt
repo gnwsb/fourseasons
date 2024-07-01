@@ -23,6 +23,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class SeasonNoteFragment : Fragment() {
 
@@ -53,31 +55,32 @@ class SeasonNoteFragment : Fragment() {
         backgroundImageView = view.findViewById(R.id.season_background)
         notesContainer = view.findViewById(R.id.notesContainer)
 
+        setupTitleTextView(titleTextView)
+        backgroundImageView.setImageDrawable(getSeasonDrawable(season))
+        loadNotes()
+
+        // 빈 공간 클릭 시 새로운 노트 추가 및 키보드 표시
+        view.setOnClickListener {
+            if (!isAddingNote) {
+                addNewNoteWithFocus()
+            }
+        }
+    }
+
+    private fun setupTitleTextView(titleTextView: TextView) {
         val seasonName = getSeasonName(season)
         val titleText = getString(R.string.season_title, seasonName)
-
-        // Apply styles to the title text
         val seasonIndex = titleText.indexOf(seasonName)
         val spannable = SpannableString(titleText).apply {
             setSpan(ForegroundColorSpan(getSeasonColor(season)), seasonIndex, seasonIndex + seasonName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(StyleSpan(Typeface.BOLD), seasonIndex, seasonIndex + seasonName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             val kopubMedium = ResourcesCompat.getFont(requireContext(), R.font.kopubmedium)
-            if (kopubMedium != null) {
-                setSpan(CustomTypefaceSpan(kopubMedium), seasonIndex, seasonIndex + seasonName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            kopubMedium?.let {
+                setSpan(CustomTypefaceSpan(it), seasonIndex, seasonIndex + seasonName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
         titleTextView.text = spannable
         titleTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-        backgroundImageView.setImageDrawable(getSeasonDrawable(season))
-
-        loadNotes()
-
-        view.setOnClickListener {
-            if (!isAddingNote) {
-                addNewNote()
-            }
-        }
     }
 
     private fun getSeasonName(season: String): String {
@@ -112,7 +115,7 @@ class SeasonNoteFragment : Fragment() {
     }
 
     private fun loadNotes() {
-        val notes = sharedPreferences.getStringSet("${season}_notes", emptySet()) ?: return
+        val notes = getNotesFromPreferences()
         notesContainer.removeAllViews()
         notes.forEach {
             val textView = TextView(context).apply {
@@ -132,7 +135,7 @@ class SeasonNoteFragment : Fragment() {
         }
     }
 
-    private fun addNewNote() {
+    private fun addNewNoteWithFocus() {
         if (notesContainer.childCount >= 6) return
 
         isAddingNote = true
@@ -176,7 +179,7 @@ class SeasonNoteFragment : Fragment() {
                     false
                 }
             }
-            setOnKeyListener { v, keyCode, event ->
+            setOnKeyListener { _, keyCode, event ->
                 if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                     val enteredText = text.toString()
                     if (enteredText.isNotEmpty()) {
@@ -248,9 +251,7 @@ class SeasonNoteFragment : Fragment() {
                     }
                     notesContainer.removeView(this)
                     if (enteredText.isEmpty()) {
-                        val notes = sharedPreferences.getStringSet("${season}_notes", mutableSetOf())?.toMutableSet()
-                        notes?.remove(currentText)
-                        sharedPreferences.edit().putStringSet("${season}_notes", notes).apply()
+                        removeNoteFromPreferences(currentText)
                     }
                     isAddingNote = false
                     hideKeyboard()
@@ -259,7 +260,7 @@ class SeasonNoteFragment : Fragment() {
                     false
                 }
             }
-            setOnKeyListener { v, keyCode, event ->
+            setOnKeyListener { _, keyCode, event ->
                 if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                     val enteredText = text.toString()
                     if (enteredText.isNotEmpty()) {
@@ -281,9 +282,7 @@ class SeasonNoteFragment : Fragment() {
                     }
                     notesContainer.removeView(this)
                     if (enteredText.isEmpty()) {
-                        val notes = sharedPreferences.getStringSet("${season}_notes", mutableSetOf())?.toMutableSet()
-                        notes?.remove(currentText)
-                        sharedPreferences.edit().putStringSet("${season}_notes", notes).apply()
+                        removeNoteFromPreferences(currentText)
                     }
                     isAddingNote = false
                     hideKeyboard()
@@ -301,9 +300,24 @@ class SeasonNoteFragment : Fragment() {
     }
 
     private fun saveNoteToPreferences(note: String) {
-        val notes = sharedPreferences.getStringSet("${season}_notes", mutableSetOf())?.toMutableSet()
-        notes?.add(note)
-        sharedPreferences.edit().putStringSet("${season}_notes", notes).apply()
+        val notes = getNotesFromPreferences().toMutableList()
+        notes.add(note)
+        sharedPreferences.edit().putString("${season}_notes", Gson().toJson(notes)).apply()
+    }
+
+    private fun removeNoteFromPreferences(note: String) {
+        val notes = getNotesFromPreferences().toMutableList()
+        notes.remove(note)
+        sharedPreferences.edit().putString("${season}_notes", Gson().toJson(notes)).apply()
+    }
+
+    private fun getNotesFromPreferences(): List<String> {
+        val json = sharedPreferences.getString("${season}_notes", null)
+        return if (json != null) {
+            Gson().fromJson(json, object : TypeToken<List<String>>() {}.type)
+        } else {
+            emptyList()
+        }
     }
 
     private fun showKeyboard() {

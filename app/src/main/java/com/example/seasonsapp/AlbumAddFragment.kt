@@ -15,10 +15,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.*
-import retrofit2.converter.gson.GsonConverterFactory
 import android.graphics.Color
 import androidx.core.content.res.ResourcesCompat
 class AlbumAddFragment : Fragment() {

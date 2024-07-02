@@ -1,3 +1,4 @@
 <resources>
     <dimen name="grid_spacing">8dp</dimen>
+    <dimen name="margin_8dp">8dp</dimen>
 </resources>

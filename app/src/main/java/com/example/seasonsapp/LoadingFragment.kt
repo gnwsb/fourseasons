@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 
 class LoadingFragment : Fragment() {
 
+    //Fragment Lifecycle: CREATED
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -21,6 +22,7 @@ class LoadingFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_loading, container, false)
     }
 
+    //Fragment Lifecycle: CREATED
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

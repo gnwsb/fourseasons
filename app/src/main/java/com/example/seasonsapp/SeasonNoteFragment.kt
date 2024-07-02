@@ -180,11 +180,15 @@ class SeasonNoteFragment : Fragment() {
             }
 
             notesContainer.addView(editText)
-            editText.requestFocus()
 
-            view?.postDelayed({
-                showKeyboard(editText)
-            }, 100)
+            // 포커스 설정 및 키보드 표시를 지연 실행
+            editText.post {
+                editText.requestFocus()
+                editText.isFocusableInTouchMode = true
+                editText.isCursorVisible = true
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
     }
 
@@ -235,78 +239,64 @@ class SeasonNoteFragment : Fragment() {
             gravity = View.TEXT_ALIGNMENT_CENTER
             textAlignment = View.TEXT_ALIGNMENT_CENTER
             imeOptions = EditorInfo.IME_ACTION_DONE
+
             setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    val enteredText = text.toString()
-                    if (enteredText.isNotEmpty()) {
-                        saveNoteToPreferences(enteredText)
-                        val newTextView = TextView(context).apply {
-                            text = enteredText
-                            setTextAppearance(R.style.NoteTextStyle)
-                            gravity = View.TEXT_ALIGNMENT_CENTER
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                setMargins(0, 48, 0, 48) // Add top and bottom margins
-                            }
-                            setOnClickListener { editNoteTextView(this) }
-                        }
-                        notesContainer.addView(newTextView, currentIndex)
-                    }
-                    notesContainer.removeView(this)
-                    if (enteredText.isEmpty()) {
-                        removeNoteFromPreferences(currentText)
-                    }
-                    isAddingNote = false
-                    hideKeyboard()
+                    handleNoteEdit(this, currentText, currentIndex)
                     true
                 } else {
                     false
                 }
             }
+
             setOnKeyListener { _, keyCode, event ->
                 if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    val enteredText = text.toString()
-                    if (enteredText.isNotEmpty()) {
-                        saveNoteToPreferences(enteredText)
-                        val newTextView = TextView(context).apply {
-                            text = enteredText
-                            setTextAppearance(R.style.NoteTextStyle)
-                            gravity = View.TEXT_ALIGNMENT_CENTER
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                setMargins(0, 48, 0, 48) // Add top and bottom margins
-                            }
-                            setOnClickListener { editNoteTextView(this) }
-                        }
-                        notesContainer.addView(newTextView, currentIndex)
-                    }
-                    notesContainer.removeView(this)
-                    if (enteredText.isEmpty()) {
-                        removeNoteFromPreferences(currentText)
-                    }
-                    isAddingNote = false
-                    hideKeyboard()
+                    handleNoteEdit(this, currentText, currentIndex)
                     true
                 } else {
                     false
                 }
             }
         }
+
         notesContainer.addView(editText, currentIndex)
         editText.requestFocus()
         editText.setSelection(editText.text.length)
-        showKeyboard(editText)
+
         editText.postDelayed({
             editText.requestFocus()
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
         }, 200)
+    }
+
+    private fun handleNoteEdit(editText: EditText, originalText: String, index: Int) {
+        val enteredText = editText.text.toString().trim()
+        if (enteredText.isEmpty()) {
+            // 텍스트가 비어있으면 노트를 삭제
+            notesContainer.removeView(editText)
+            removeNoteFromPreferences(originalText)
+        } else {
+            // 텍스트가 있으면 노트를 저장
+            saveNoteToPreferences(enteredText)
+            val newTextView = TextView(context).apply {
+                text = enteredText
+                setTextAppearance(R.style.NoteTextStyle)
+                gravity = View.TEXT_ALIGNMENT_CENTER
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 48, 0, 48)
+                }
+                setOnClickListener { editNoteTextView(this) }
+            }
+            notesContainer.removeView(editText)
+            notesContainer.addView(newTextView, index)
+        }
+        isAddingNote = false
+        hideKeyboard()
     }
 
     private fun saveNoteToPreferences(note: String) {

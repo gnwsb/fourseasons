@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 
 class AlbumDetailActivity : AppCompatActivity() {
@@ -18,6 +19,10 @@ class AlbumDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_album_detail)
+
+        // 상단바를 투명하게 설정
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
 
         val season = intent.getStringExtra("season")
         sharedPreferences = getSharedPreferences("${season}_album_prefs", Context.MODE_PRIVATE)

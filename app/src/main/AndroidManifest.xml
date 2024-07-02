@@ -38,7 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AlbumDetailActivity" />
+        <activity android:name=".AlbumDetailActivity"
+            android:theme="@style/Theme.Uma"
+            android:exported="true"/>
     </application>
 
 </manifest>

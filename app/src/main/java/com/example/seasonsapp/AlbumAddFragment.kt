@@ -1,6 +1,7 @@
 package com.example.seasonsapp
 
 import android.app.AlertDialog
+import androidx.navigation.fragment.findNavController
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -130,6 +131,15 @@ class AlbumAddFragment : Fragment() {
             val albumName = album.name
             val artistName = album.artists.joinToString(", ") { it.name }
 
+            imageView.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putString("albumName", albumName)
+                    putString("artistName", artistName)
+                    putString("albumImageUrl", album.images[0].url)
+                }
+                findNavController().navigate(R.id.action_albumAddFragment_to_albumDetailFragment, bundle)
+            }
+
             // Update add button position
             val nextButton = view?.findViewById<ImageButton>(R.id.add_album_button)
             nextButton?.apply {
@@ -149,6 +159,16 @@ class AlbumAddFragment : Fragment() {
                             bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
                         }
                         3 -> {
+                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
+                            rightMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
+                            bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
+                        }
+                        4 -> {
+                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
+                            leftMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
+                            bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
+                        }
+                        5 -> {
                             topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
                             rightMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
                             bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)

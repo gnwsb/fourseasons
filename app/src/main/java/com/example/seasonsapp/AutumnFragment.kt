@@ -21,6 +21,7 @@ class AutumnFragment : Fragment() {
 
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.adapter = SeasonPagerAdapter(this, "autumn")
+        //viewPager2의 방향을 수직으로 설정
         viewPager.orientation = ViewPager2.ORIENTATION_VERTICAL
 
         // 초기 상태를 투명하게 설정

@@ -8,13 +8,20 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.*
+import retrofit2.converter.gson.GsonConverterFactory
 
 class AlbumAddFragment : Fragment() {
 
     private lateinit var season: String
     private var albumCount = 0
     private val imageViews = mutableListOf<ImageView>()
+    private lateinit var spotifyService: SpotifyService
 
     companion object {
         fun newInstance(season: String): AlbumAddFragment {
@@ -31,6 +38,7 @@ class AlbumAddFragment : Fragment() {
         arguments?.let {
             season = it.getString("season") ?: ""
         }
+        setupRetrofit()
     }
 
     override fun onCreateView(
@@ -54,17 +62,21 @@ class AlbumAddFragment : Fragment() {
         imageViews.add(view.findViewById(R.id.imageView4))
         imageViews.add(view.findViewById(R.id.imageView5))
         imageViews.add(view.findViewById(R.id.imageView6))
+
+        for (i in imageViews.indices) {
+            imageViews[i].visibility = if (i < albumCount) View.VISIBLE else View.GONE
+        }
     }
 
     private fun showAddAlbumDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("앨범을 추가하세요")
+        builder.setTitle("Add Album")
 
         val input = EditText(requireContext())
-        input.hint = "스포티파이 또는 유튜브 뮤직 링크"
+        input.hint = "Enter Spotify link"
         builder.setView(input)
 
-        builder.setPositiveButton("추가") { dialog, _ ->
+        builder.setPositiveButton("Add") { dialog, _ ->
             val albumLink = input.text.toString().trim()
             if (albumLink.isNotEmpty()) {
                 addAlbum(albumLink)
@@ -72,7 +84,7 @@ class AlbumAddFragment : Fragment() {
             dialog.dismiss()
         }
 
-        builder.setNegativeButton("취소") { dialog, _ ->
+        builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
         }
 
@@ -80,14 +92,45 @@ class AlbumAddFragment : Fragment() {
     }
 
     private fun addAlbum(albumLink: String) {
+        val albumId = extractAlbumId(albumLink)
+        if (albumId != null && albumCount < imageViews.size) {
+            fetchAlbumData(albumId)
+        } else {
+            Toast.makeText(requireContext(), "Invalid Spotify link or maximum albums added", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun fetchAlbumData(albumId: String) {
+        val token = "BQDpw5nmija_CPlBtC-hf52I2L6y_CigWDAtjSLj4i89Nv3TSgcUWB3z8KU4b5fMNU76DmgZ4yrmZDnsWQpBdp7NwtpvlCDGYO-_09cahKGJy8bXQ-jVFU_QKqJiDM73ysWEUxBoYAI5oFyt3053manDEM9PbDZY8I2W2Fxamvl9k_Nf9wKQAVCVfoAyko-KV3DIY-lio_hw4h8RaBztAaMjuF8RvWjbpJb_DBwNNdwCCaBH0kBgIqv94Dd6zckF_wxCsrTmXu6k8DvWvx6-L6ovGmZ0"  // Replace with your actual Spotify token
+
+        spotifyService.getAlbum(albumId, "Bearer $token").enqueue(object : Callback<AlbumResponse> {
+            override fun onResponse(call: Call<AlbumResponse>, response: Response<AlbumResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { album ->
+                        updateAlbumUI(album)
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Failed to fetch album data", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<AlbumResponse>, t: Throwable) {
+                t.printStackTrace()
+                Toast.makeText(requireContext(), "Failed to fetch album data", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun updateAlbumUI(album: AlbumResponse) {
         if (albumCount < imageViews.size) {
             val imageView = imageViews[albumCount]
             imageView.visibility = View.VISIBLE
-            // 앨범 이미지를 설정하는 로직 추가
-            // 예시로 고정된 이미지 리소스를 사용합니다.
-            imageView.setImageResource(R.drawable.plus) // 앨범 이미지를 설정하세요.
+            Glide.with(this).load(album.images[0].url).into(imageView)
 
-            // 다음 앨범 추가 버튼의 위치를 업데이트
+            val albumName = album.name
+            val artistName = album.artists.joinToString(", ") { it.name }
+
+            // Update add button position
             val nextButton = view?.findViewById<ImageButton>(R.id.add_album_button)
             nextButton?.apply {
                 layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
@@ -110,11 +153,33 @@ class AlbumAddFragment : Fragment() {
                             rightMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
                             bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
                         }
-                        // 나머지 경우도 처리
                     }
                 }
             }
             albumCount++
         }
+    }
+
+    private fun extractAlbumId(albumLink: String): String? {
+        val regex = Regex("album/([a-zA-Z0-9]+)")
+        val matchResult = regex.find(albumLink)
+        return matchResult?.groups?.get(1)?.value
+    }
+
+    private fun setupRetrofit() {
+        val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.BODY
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.spotify.com/v1/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        spotifyService = retrofit.create(SpotifyService::class.java)
     }
 }

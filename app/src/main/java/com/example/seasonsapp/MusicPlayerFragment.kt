@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 
 class MusicPlayerFragment : Fragment() {
 
-    private lateinit var mediaPlayer: MediaPlayer
     private var albumResId: Int? = null
     private var imageResId: Int? = null
     private var season: String? = null
@@ -44,7 +43,7 @@ class MusicPlayerFragment : Fragment() {
         val songTitle: TextView = view.findViewById(R.id.song_title)
         val songArtist: TextView = view.findViewById(R.id.song_artist)
 
-        // 배경 이미지 설정
+        // Set background image
         val rootView: View = view.findViewById(R.id.music_player_root)
         season?.let {
             val backgroundDrawable = when (it.lowercase()) {
@@ -58,8 +57,6 @@ class MusicPlayerFragment : Fragment() {
         }
 
         exitButton.setOnClickListener {
-            mediaPlayer.stop()
-            mediaPlayer.release()
             findNavController().navigateUp()
         }
 
@@ -74,13 +71,7 @@ class MusicPlayerFragment : Fragment() {
         }
 
         albumResId?.let {
-            mediaPlayer = MediaPlayer.create(context, it)
-            mediaPlayer.setOnCompletionListener {
-                findNavController().navigateUp()
-            }
-            mediaPlayer.start()
-
-            // 곡 정보 설정
+            // Set song information
             songInfo = songInfos[it]
             songTitle.text = songInfo?.title
             songArtist.text = songInfo?.artist
@@ -89,10 +80,5 @@ class MusicPlayerFragment : Fragment() {
         imageResId?.let {
             albumImage.setImageResource(it)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer.release()
     }
 }

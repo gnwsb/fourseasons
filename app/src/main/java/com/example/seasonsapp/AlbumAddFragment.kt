@@ -1,7 +1,10 @@
 package com.example.seasonsapp
 
+import android.app.Activity
 import android.app.AlertDialog
-import androidx.navigation.fragment.findNavController
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,9 +23,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 class AlbumAddFragment : Fragment() {
 
     private lateinit var season: String
-    private var albumCount = 0
-    private val imageViews = mutableListOf<ImageView>()
     private lateinit var spotifyService: SpotifyService
+    private lateinit var sharedPreferences: SharedPreferences
+    private val REQUEST_CODE_EDIT = 1
 
     companion object {
         fun newInstance(season: String): AlbumAddFragment {
@@ -39,7 +42,9 @@ class AlbumAddFragment : Fragment() {
         arguments?.let {
             season = it.getString("season") ?: ""
         }
-        setupRetrofit()
+        val spotifyInterceptor = SpotifyInterceptor(requireContext())
+        spotifyService = SpotifyService.create(spotifyInterceptor)
+        sharedPreferences = requireContext().getSharedPreferences("${season}_album_prefs", Context.MODE_PRIVATE)
     }
 
     override fun onCreateView(
@@ -53,31 +58,24 @@ class AlbumAddFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val addAlbumButton = view.findViewById<ImageButton>(R.id.add_album_button)
+        val albumImageView = view.findViewById<ImageView>(R.id.album_image)!!
+
         addAlbumButton.setOnClickListener {
             showAddAlbumDialog()
         }
 
-        imageViews.add(view.findViewById(R.id.imageView1))
-        imageViews.add(view.findViewById(R.id.imageView2))
-        imageViews.add(view.findViewById(R.id.imageView3))
-        imageViews.add(view.findViewById(R.id.imageView4))
-        imageViews.add(view.findViewById(R.id.imageView5))
-        imageViews.add(view.findViewById(R.id.imageView6))
-
-        for (i in imageViews.indices) {
-            imageViews[i].visibility = if (i < albumCount) View.VISIBLE else View.GONE
-        }
+        loadAlbumData(albumImageView, addAlbumButton)
     }
 
     private fun showAddAlbumDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Add Album")
+        builder.setTitle("스포티파이 링크를 입력하세요")
 
         val input = EditText(requireContext())
-        input.hint = "Enter Spotify link"
+        input.hint = "스포티파이 링크를 입력하세요"
         builder.setView(input)
 
-        builder.setPositiveButton("Add") { dialog, _ ->
+        builder.setPositiveButton("추가") { dialog, _ ->
             val albumLink = input.text.toString().trim()
             if (albumLink.isNotEmpty()) {
                 addAlbum(albumLink)
@@ -85,30 +83,24 @@ class AlbumAddFragment : Fragment() {
             dialog.dismiss()
         }
 
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.cancel()
-        }
-
         builder.show()
     }
 
     private fun addAlbum(albumLink: String) {
         val albumId = extractAlbumId(albumLink)
-        if (albumId != null && albumCount < imageViews.size) {
-            fetchAlbumData(albumId)
+        if (albumId != null) {
+            fetchAlbumData(albumId, albumLink)
         } else {
-            Toast.makeText(requireContext(), "Invalid Spotify link or maximum albums added", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Invalid Spotify link", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun fetchAlbumData(albumId: String) {
-        val token = "BQDpw5nmija_CPlBtC-hf52I2L6y_CigWDAtjSLj4i89Nv3TSgcUWB3z8KU4b5fMNU76DmgZ4yrmZDnsWQpBdp7NwtpvlCDGYO-_09cahKGJy8bXQ-jVFU_QKqJiDM73ysWEUxBoYAI5oFyt3053manDEM9PbDZY8I2W2Fxamvl9k_Nf9wKQAVCVfoAyko-KV3DIY-lio_hw4h8RaBztAaMjuF8RvWjbpJb_DBwNNdwCCaBH0kBgIqv94Dd6zckF_wxCsrTmXu6k8DvWvx6-L6ovGmZ0"  // Replace with your actual Spotify token
-
-        spotifyService.getAlbum(albumId, "Bearer $token").enqueue(object : Callback<AlbumResponse> {
+    private fun fetchAlbumData(albumId: String, albumLink: String) {
+        spotifyService.getAlbum(albumId).enqueue(object : Callback<AlbumResponse> {
             override fun onResponse(call: Call<AlbumResponse>, response: Response<AlbumResponse>) {
                 if (response.isSuccessful) {
                     response.body()?.let { album ->
-                        updateAlbumUI(album)
+                        updateAlbumUI(album, albumLink)
                     }
                 } else {
                     Toast.makeText(requireContext(), "Failed to fetch album data", Toast.LENGTH_SHORT).show()
@@ -122,61 +114,70 @@ class AlbumAddFragment : Fragment() {
         })
     }
 
-    private fun updateAlbumUI(album: AlbumResponse) {
-        if (albumCount < imageViews.size) {
-            val imageView = imageViews[albumCount]
-            imageView.visibility = View.VISIBLE
-            Glide.with(this).load(album.images[0].url).into(imageView)
+    private fun updateAlbumUI(album: AlbumResponse, albumLink: String) {
+        val albumImageView = view?.findViewById<ImageView>(R.id.album_image)!!
+        val addAlbumButton = view?.findViewById<ImageButton>(R.id.add_album_button)
 
-            val albumName = album.name
-            val artistName = album.artists.joinToString(", ") { it.name }
+        albumImageView.visibility = View.VISIBLE
+        Glide.with(this).load(album.images[0].url).into(albumImageView)
 
-            imageView.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putString("albumName", albumName)
-                    putString("artistName", artistName)
-                    putString("albumImageUrl", album.images[0].url)
-                }
-                findNavController().navigate(R.id.action_albumAddFragment_to_albumDetailFragment, bundle)
+        saveAlbumData(album, albumLink)
+
+        albumImageView.setOnClickListener {
+            val intent = Intent(requireContext(), AlbumDetailActivity::class.java).apply {
+                putExtra("albumName", album.name)
+                putExtra("artistName", album.artists.joinToString(", ") { it.name })
+                putExtra("albumImageUrl", album.images[0].url)
+                putExtra("season", season)
+                putExtra("spotifyLink", albumLink)
             }
+            startActivityForResult(intent, REQUEST_CODE_EDIT)
+            requireActivity().overridePendingTransition(0, 0)
+        }
 
-            // Update add button position
-            val nextButton = view?.findViewById<ImageButton>(R.id.add_album_button)
-            nextButton?.apply {
-                layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
-                    when (albumCount) {
-                        0 -> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            leftMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                        }
-                        1 -> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            rightMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                        }
-                        2 -> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            leftMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                        }
-                        3 -> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            rightMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                        }
-                        4 -> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            leftMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                        }
-                        5 -> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            rightMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                            bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_8dp)
-                        }
-                    }
+        addAlbumButton?.visibility = View.GONE
+    }
+
+    private fun saveAlbumData(album: AlbumResponse, albumLink: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("albumId", album.id)
+        editor.putString("albumName", album.name)
+        editor.putString("artistName", album.artists.joinToString(", ") { it.name })
+        editor.putString("albumImageUrl", album.images[0].url)
+        editor.putString("spotifyLink", albumLink)
+        editor.apply()
+    }
+
+    private fun loadAlbumData(albumImageView: ImageView, addAlbumButton: ImageButton) {
+        val albumImageUrl = sharedPreferences.getString("albumImageUrl", null)
+        if (albumImageUrl != null) {
+            albumImageView.visibility = View.VISIBLE
+            Glide.with(this).load(albumImageUrl).into(albumImageView)
+            addAlbumButton.visibility = View.GONE
+
+            albumImageView.setOnClickListener {
+                val intent = Intent(requireContext(), AlbumDetailActivity::class.java).apply {
+                    putExtra("albumName", sharedPreferences.getString("albumName", ""))
+                    putExtra("artistName", sharedPreferences.getString("artistName", ""))
+                    putExtra("albumImageUrl", albumImageUrl)
+                    putExtra("season", season)
+                    putExtra("spotifyLink", sharedPreferences.getString("spotifyLink", ""))
                 }
+                startActivityForResult(intent, REQUEST_CODE_EDIT)
+                requireActivity().overridePendingTransition(0, 0)
             }
-            albumCount++
+        } else {
+            albumImageView.visibility = View.GONE
+            addAlbumButton.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_EDIT && resultCode == Activity.RESULT_OK) {
+            val albumImageView = view?.findViewById<ImageView>(R.id.album_image)!!
+            val addAlbumButton = view?.findViewById<ImageButton>(R.id.add_album_button)!!
+            loadAlbumData(albumImageView, addAlbumButton)
         }
     }
 
@@ -184,22 +185,5 @@ class AlbumAddFragment : Fragment() {
         val regex = Regex("album/([a-zA-Z0-9]+)")
         val matchResult = regex.find(albumLink)
         return matchResult?.groups?.get(1)?.value
-    }
-
-    private fun setupRetrofit() {
-        val logging = HttpLoggingInterceptor()
-        logging.level = HttpLoggingInterceptor.Level.BODY
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(logging)
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.spotify.com/v1/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        spotifyService = retrofit.create(SpotifyService::class.java)
     }
 }

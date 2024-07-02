@@ -142,6 +142,7 @@ class SeasonNoteFragment : Fragment() {
 
         view?.post {
             val editText = EditText(requireContext()).apply {
+                background = null
                 hint = "당신의 계절을 입력하세요"
                 maxLines = 1
                 inputType = InputType.TYPE_CLASS_TEXT
@@ -162,6 +163,12 @@ class SeasonNoteFragment : Fragment() {
                         false
                     }
                 }
+
+                val customTypeface = ResourcesCompat.getFont(context, R.font.kopublight)
+                typeface = customTypeface
+
+                setHintTextColor(ContextCompat.getColor(context, R.color.black))
+
                 setOnKeyListener { _, keyCode, event ->
                     if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                         saveNote(this)
@@ -213,6 +220,11 @@ class SeasonNoteFragment : Fragment() {
         val currentIndex = notesContainer.indexOfChild(textView)
         notesContainer.removeView(textView)
         val editText = EditText(context).apply {
+            val customTypeface = ResourcesCompat.getFont(context, R.font.kopublight)
+            typeface = customTypeface
+
+            setHintTextColor(ContextCompat.getColor(context, R.color.black))
+            background = null
             setText(currentText)
             maxLines = 1
             inputType = InputType.TYPE_CLASS_TEXT
@@ -286,11 +298,15 @@ class SeasonNoteFragment : Fragment() {
                 }
             }
         }
-
         notesContainer.addView(editText, currentIndex)
         editText.requestFocus()
         editText.setSelection(editText.text.length)
         showKeyboard(editText)
+        editText.postDelayed({
+            editText.requestFocus()
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+        }, 200)
     }
 
     private fun saveNoteToPreferences(note: String) {

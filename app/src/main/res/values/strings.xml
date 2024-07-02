@@ -11,4 +11,7 @@
     <string name="season_background">Season Background</string>
     <string name="season_title">나의 %1$s은</string>
     <string name="tree_image">Tree Image</string>
+    <string name="edit">Edit</string>
+    <string name="spotify_client_id">28a9b5cd605e40e596d4154bdc21946f</string>
+    <string name="spotify_client_secret">9b9cacda2c434381b1ba95931c4925db</string>
 </resources>

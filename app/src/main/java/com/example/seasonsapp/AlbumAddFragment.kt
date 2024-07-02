@@ -69,7 +69,7 @@ class AlbumAddFragment : Fragment() {
 
     private fun showAddAlbumDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("스포티파이 링크를 입력하세요")
+        builder.setTitle("")
 
         val input = EditText(requireContext())
         input.hint = "스포티파이 링크를 입력하세요"

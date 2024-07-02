@@ -19,14 +19,12 @@ import androidx.fragment.app.Fragment
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.Calendar
-import java.util.Date
 import android.widget.LinearLayout
 
 @Suppress("DEPRECATION")
 class ContactFragment : Fragment() {
 
     private lateinit var season: String
-    private val REQUEST_CODE_READ_CONTACTS = 100
 
     companion object {
         fun newInstance(season: String): ContactFragment {
@@ -63,32 +61,9 @@ class ContactFragment : Fragment() {
             // 통화 기록 접근 코드
             loadContacts()
         } else {
-            // 권한 요청
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.READ_CALL_LOG,
-                    Manifest.permission.READ_CONTACTS
-                ), REQUEST_CODE_READ_CONTACTS
-            )
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_READ_CONTACTS) {
-            if ((grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED })) {
-                // 권한이 부여되면 통화 기록을 로드
-                loadContacts()
-            } else {
-                // 권한이 거부되었을 때 처리
-                Toast.makeText(requireContext(), "통화 기록 및 연락처 접근 권한이 필요합니다.", Toast.LENGTH_SHORT)
-                    .show()
-            }
+            // 권한이 없으면 권한이 필요하다는 메시지 표시
+            Toast.makeText(requireContext(), "통화 기록 및 연락처 접근 권한이 필요합니다.", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 

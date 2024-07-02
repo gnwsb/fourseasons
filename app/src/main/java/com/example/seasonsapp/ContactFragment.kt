@@ -18,8 +18,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.Calendar
+import java.util.Date
 import android.widget.LinearLayout
 
+@Suppress("DEPRECATION")
 class ContactFragment : Fragment() {
 
     private lateinit var season: String
@@ -70,6 +73,7 @@ class ContactFragment : Fragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -157,15 +161,42 @@ class ContactFragment : Fragment() {
     }
 
     private fun isDateInSeason(date: Long): Boolean {
-        val calendar = java.util.Calendar.getInstance()
+        val calendar = Calendar.getInstance()
         calendar.timeInMillis = date
-        val month = calendar.get(java.util.Calendar.MONTH) + 1
+        val month = calendar.get(Calendar.MONTH) + 1
+        val year = calendar.get(Calendar.YEAR)
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
 
         return when (season) {
-            "spring" -> month in 3..5
-            "summer" -> month in 6..8
-            "autumn" -> month in 9..11
-            "winter" -> month == 12 || month in 1..2
+            "spring" -> {
+                if (currentMonth >= 6) {
+                    month in 3..5 && year == currentYear
+                } else {
+                    month in 3..5 && year == currentYear - 1
+                }
+            }
+            "summer" -> {
+                if (currentMonth >= 9) {
+                    month in 6..8 && year == currentYear
+                } else {
+                    month in 6..8 && year == currentYear - 1
+                }
+            }
+            "autumn" -> {
+                if (currentMonth >= 12) {
+                    month in 9..11 && year == currentYear
+                } else {
+                    month in 9..11 && year == currentYear - 1
+                }
+            }
+            "winter" -> {
+                if (currentMonth >= 3) {
+                    (month == 12 && year == currentYear - 1) || (month in 1..2 && year == currentYear)
+                } else {
+                    (month == 12 && year == currentYear - 2) || (month in 1..2 && year == currentYear - 1)
+                }
+            }
             else -> false
         }
     }
@@ -245,15 +276,6 @@ class ContactFragment : Fragment() {
     private fun getRandomPoemForSeason(): String {
         val assetManager = requireContext().assets
 
-        // 디버깅: assets 폴더 내 파일 목록 출력
-        try {
-            val assetFiles = assetManager.list("")
-            Log.d("ContactFragment", "Assets directory contains: ${assetFiles?.joinToString()}")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Log.e("ContactFragment", "Error listing assets", e)
-        }
-
         val files = when (season) {
             "spring" -> arrayOf(
                 "spp1.txt",
@@ -273,7 +295,15 @@ class ContactFragment : Fragment() {
                 "sup6.txt"
             )
 
-            "autumn" -> arrayOf("ap1.txt", "ap2.txt", "ap3.txt", "ap4.txt", "ap5.txt", "ap6.txt")
+            "autumn" -> arrayOf(
+                "ap1.txt",
+                "ap2.txt",
+                "ap3.txt",
+                "ap4.txt",
+                "ap5.txt",
+                "ap6.txt"
+            )
+
             "winter" -> arrayOf(
                 "wp1.txt",
                 "wp2.txt",
@@ -297,11 +327,9 @@ class ContactFragment : Fragment() {
             val inputStream = assetManager.open(randomFile)
             val bufferedReader = BufferedReader(InputStreamReader(inputStream))
             val poem = bufferedReader.use { it.readText() }
-            Log.d("ContactFragment", "Successfully read from file: $randomFile")
             poem
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("ContactFragment", "Error reading file: $randomFile", e)
             "계절에 맞는 시를 찾을 수 없습니다. 파일 이름: $randomFile"
         }
     }

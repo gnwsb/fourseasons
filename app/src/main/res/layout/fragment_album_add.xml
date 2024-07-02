@@ -6,26 +6,26 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- 앨범 추가 버튼 -->
+    <!-- Add Album Button -->
     <ImageButton
         android:id="@+id/add_album_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_margin="8dp"
         android:scaleType="centerCrop"
         android:src="@drawable/plus"
-    android:background="?attr/selectableItemBackgroundBorderless"
-    app:layout_constraintBottom_toTopOf="@+id/imageView3"
-    app:layout_constraintDimensionRatio="1:1"
-    app:layout_constraintEnd_toStartOf="@+id/imageView2"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toTopOf="@+id/imageView3"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/imageView2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 첫 번째 앨범 이미지 -->
+    <!-- First Album Image -->
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="149dp"
-        android:layout_height="114dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_margin="8dp"
         android:scaleType="centerCrop"
         android:visibility="gone"
@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 두 번째 앨범 이미지 -->
+    <!-- Second Album Image -->
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="0dp"
@@ -49,7 +49,7 @@
         app:layout_constraintBottom_toTopOf="@+id/imageView4"
         android:layout_margin="8dp" />
 
-    <!-- 세 번째 앨범 이미지 -->
+    <!-- Third Album Image -->
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="0dp"
@@ -63,7 +63,7 @@
         app:layout_constraintBottom_toTopOf="@+id/imageView5"
         android:layout_margin="8dp" />
 
-    <!-- 네 번째 앨범 이미지 -->
+    <!-- Fourth Album Image -->
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="0dp"
@@ -77,7 +77,7 @@
         app:layout_constraintBottom_toTopOf="@+id/imageView6"
         android:layout_margin="8dp" />
 
-    <!-- 다섯 번째 앨범 이미지 -->
+    <!-- Fifth Album Image -->
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="0dp"
@@ -91,7 +91,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <!-- 여섯 번째 앨범 이미지 -->
+    <!-- Sixth Album Image -->
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="0dp"

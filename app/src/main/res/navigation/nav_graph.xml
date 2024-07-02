@@ -79,5 +79,19 @@
             app:argType="integer" />
     </fragment>
 
+    <fragment
+        android:id="@+id/albumAddFragment"
+        android:name="com.example.seasonsapp.AlbumAddFragment"
+        android:label="album_add_fragment"
+        tools:layout="@layout/fragment_album_add">
+        <action
+            android:id="@+id/action_albumAddFragment_to_albumDetailFragment"
+            app:destination="@id/albumDetailFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/albumDetailFragment"
+        android:name="com.example.seasonsapp.AlbumDetailFragment"
+        android:label="album_detail_fragment"
+        tools:layout="@layout/fragment_album_detail" />
 </navigation>

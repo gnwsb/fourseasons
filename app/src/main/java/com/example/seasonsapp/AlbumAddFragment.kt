@@ -19,7 +19,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
-
+import android.graphics.Color
+import androidx.core.content.res.ResourcesCompat
 class AlbumAddFragment : Fragment() {
 
     private lateinit var season: String
@@ -68,23 +69,36 @@ class AlbumAddFragment : Fragment() {
     }
 
     private fun showAddAlbumDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_album, null)
+        val input = dialogView.findViewById<EditText>(R.id.album_link_input)
+
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("")
-
-        val input = EditText(requireContext())
-        input.hint = "스포티파이 링크를 입력하세요"
-        builder.setView(input)
-
-        builder.setPositiveButton("추가") { dialog, _ ->
-            val albumLink = input.text.toString().trim()
-            if (albumLink.isNotEmpty()) {
-                addAlbum(albumLink)
+        builder.setView(dialogView)
+            .setPositiveButton("추가") { dialog, _ ->
+                val albumLink = input.text.toString().trim()
+                if (albumLink.isNotEmpty()) {
+                    addAlbum(albumLink)
+                }
+                dialog.dismiss()
             }
-            dialog.dismiss()
-        }
+            .setNegativeButton("") { dialog, _ ->
+                dialog.cancel()
+            }
 
-        builder.show()
+        val dialog = builder.create()
+        dialog.show()
+
+        // 버튼 스타일 수정
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
+            setTextColor(Color.BLACK)
+            typeface = ResourcesCompat.getFont(requireContext(), R.font.kopublight)
+        }
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).apply {
+            setTextColor(Color.BLACK)
+            typeface = ResourcesCompat.getFont(requireContext(), R.font.kopublight)
+        }
     }
+
 
     private fun addAlbum(albumLink: String) {
         val albumId = extractAlbumId(albumLink)

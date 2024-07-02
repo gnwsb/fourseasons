@@ -46,6 +46,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 
+
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
@@ -63,4 +64,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation ("com.google.code.gson:gson:2.8.8")
+    implementation ("me.relex:circleindicator:2.1.6")
 }

@@ -60,7 +60,7 @@ class AlbumDetailActivity : AppCompatActivity() {
         shareButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "Check out this album: $spotifyLink")
+                putExtra(Intent.EXTRA_TEXT, "$spotifyLink")
             }
             startActivity(Intent.createChooser(shareIntent, "Share Album"))
         }

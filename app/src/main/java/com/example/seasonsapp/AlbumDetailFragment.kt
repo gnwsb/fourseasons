@@ -53,7 +53,7 @@ class AlbumDetailFragment : Fragment() {
         shareButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "Check out this album: ${albumName.text} by ${artistName.text}")
+                putExtra(Intent.EXTRA_TEXT, "${albumName.text} by ${artistName.text}")
             }
             startActivity(Intent.createChooser(intent, "Share Album"))
         }

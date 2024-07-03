@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 
 class MainActivity : AppCompatActivity() {
 
+
     private val permissionsRequestCode = 100
     private val requiredPermissions = arrayOf(
         Manifest.permission.READ_CONTACTS,

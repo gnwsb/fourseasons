@@ -16,13 +16,6 @@
 <h2 id="-">기술 스택</h2>
 <p><strong>프론트엔드</strong>: 코틀린</p>
 <p><strong>통합개발환경</strong>: 안드로이드 스튜디오</p>
-<h2 id="-">미리보기</h2>
-<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/5698a59f-6042-4f33-a1e4-af529936861e/1000070138.gif" alt="1000070138.gif"></p>
-<p><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/1167b2aa-451b-4560-99bb-c70c17e55cb2/1000070146.gif" alt="1000070146.gif"></p>
-<p><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/654eff26-7539-49e2-bc73-1a7c16275eab/1000070118.mp4">1000070118.mp4</a></p>
-<p><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/34121b63-f5fa-4dfe-baf4-4f209f60609a/1000070134.mp4">1000070134.mp4</a></p>
-<p><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/3673fdb2-2533-442d-9125-824c2ef9eaff/1000070150.mp4">1000070150.mp4</a></p>
-<p><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/7388b0d4-ce1c-4b23-a610-bcd9c8bba233/1000070129.mp4">1000070129.mp4</a></p>
 <h2 id="-">설명</h2>
 <h2 id="-">계절 선택</h2>
 <pre><code>사용자가 기억하고 싶은 계절을 선택할 수 있습니다.
